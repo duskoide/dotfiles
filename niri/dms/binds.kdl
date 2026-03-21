@@ -5,10 +5,11 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // === Application Launchers ===
-    Mod+return hotkey-overlay-title="Open Terminal" { spawn "ghostty"; }
+    Mod+return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
     Mod+D hotkey-overlay-title="Application Launcher" {
-        spawn "dms" "ipc" "call" "spotlight" "toggle";
+        //spawn "dms" "ipc" "call" "spotlight" "toggle";
         //spawn "rofi" "-show" "drun";
+        spawn "fuzzel";
     }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "dms" "ipc" "call" "clipboard" "toggle";
