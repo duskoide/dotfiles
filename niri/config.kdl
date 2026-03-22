@@ -188,10 +188,12 @@ overview {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 environment {
   XDG_CURRENT_DESKTOP "niri"
+  GTK_THEME "Adawaita-dark"
 }
 hotkey-overlay {
     skip-at-startup
 }
+spawn-at-startup "xwayland-satellite"
 spawn-at-startup "nixGL" "dms" "run"
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
@@ -282,6 +284,10 @@ window-rule {
 window-rule {
     match app-id=r#"org.quickshell$"#
     open-floating true
+}
+window-rule {
+    match app-id="kitty"
+    opacity 0.8
 }
 debug {
     honor-xdg-activation-with-invalid-serial
