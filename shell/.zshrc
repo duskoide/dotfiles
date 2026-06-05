@@ -1,39 +1,10 @@
-# ~/.zsh/.zshrc
-
-#==============================================================================
-
-# ███████╗██╗  ██╗███████╗██╗         ███╗   ██╗██╗███╗   ██╗     ██╗ █████╗ 
-# ██╔════╝██║  ██║██╔════╝██║         ████╗  ██║██║████╗  ██║     ██║██╔══██╗
-# ███████╗███████║█████╗  ██║         ██╔██╗ ██║██║██╔██╗ ██║     ██║███████║
-# ╚════██║██╔══██║██╔══╝  ██║         ██║╚██╗██║██║██║╚██╗██║██   ██║██╔══██║
-# ███████║██║  ██║███████╗███████╗    ██║ ╚████║██║██║ ╚████║╚█████╔╝██║  ██║
-# ╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝    ╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚════╝ ╚═╝  ╚═╝
-                                                                            
-#==============================================================================
-
-# fastfetch
-if command -v fastfetch &> /dev/null; then
-    # Only run fastfetch if we're in an interactive shell
-    if [[ $- == *i* ]]; then
-        if [[ -d "$HOME/.local/share/fastfetch" ]]; then
-            ffconfig=simple
-            fastfetch --config "$ffconfig"
-            alias fastfetch='clr && fastfetch --config $ffconfig'
-        else
-            fastfetch
-        fi
-    fi
-
-fi
-
-# p10k cache config
+# p10k instant prompt must be sourced early
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-
 ############################################
-# Download Zinit, if it's not there yet
+# Zinit plugin manager
 ############################################
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 if [ ! -d "$ZINIT_HOME" ]; then
@@ -42,66 +13,47 @@ if [ ! -d "$ZINIT_HOME" ]; then
 fi
 source "${ZINIT_HOME}/zinit.zsh"
 
-
-############################################
-# Add in Powerlevel10k
-############################################
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-
-############################################
-# Add in zsh plugins
-############################################
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
-zinit light jeffreytse/zsh-vi-mode
 
-# Add in snippets
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-# zinit snippet OMZP::tmuxinator
-# zinit snippet OMZP::docker
-zinit snippet OMZP::command-not-found
-
-# Disable the cursor style feature
-# ZVM_CURSOR_STYLE_ENABLED=false
 ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
 ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
+zinit light jeffreytse/zsh-vi-mode
 
-# Load completions
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::command-not-found
+
 autoload -Uz compinit && compinit
-
 zinit cdreplay -q
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.zsh/.p10k.zsh ]] || source ~/.zsh/.p10k.zsh
 
+#######################################################
+# Options
+#######################################################
+setopt autocd correct interactivecomments magicequalsubst
+setopt nonomatch notify numericglobsort promptsubst
+
+setopt appendhistory sharehistory
+setopt hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_ignore_dups hist_find_no_dups
 
 #######################################################
-# ZSH Basic Options
+# Environment
 #######################################################
-setopt autocd              # change directory just by typing its name
-setopt correct             # auto correct mistakes
-setopt interactivecomments # allow comments in interactive mode
-setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
-setopt nonomatch           # hide error message if there is no match for the pattern
-setopt notify              # report the status of background jobs immediately
-setopt numericglobsort     # sort filenames numerically when it makes sense
-setopt promptsubst         # enable command substitution in prompt
-
-
-#######################################################
-# Environment Variables
-#######################################################
-# export EDITOR=nvim
-# export VISUAL=nvim
-export EDITOR=nvim visudo
-export VISUAL=nvim visudo
+export EDITOR="nvim visudo"
+export VISUAL="nvim visudo"
 export SUDO_EDITOR=nvim
 export FCEDIT=nvim
+export HISTSIZE=10000
+export HISTFILE=~/.zsh/.zsh_history
+export SAVEHIST=$HISTSIZE
+export HISTDUP=erase
 
 if [[ -x "$(command -v bat)" ]]; then
 	export MANPAGER="sh -c 'col -bx | bat -l man -p'"
@@ -110,58 +62,24 @@ fi
 
 if [[ -x "$(command -v fzf)" ]]; then
 	export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
-	  --info=inline-right \
-	  --ansi \
-	  --layout=reverse \
-	  --border=rounded \
-	  --color=border:#27a1b9 \
-	  --color=fg:#c0caf5 \
-	  --color=gutter:#16161e \
-	  --color=header:#ff9e64 \
-	  --color=hl+:#2ac3de \
-	  --color=hl:#2ac3de \
-	  --color=info:#545c7e \
-	  --color=marker:#ff007c \
-	  --color=pointer:#ff007c \
-	  --color=prompt:#2ac3de \
-	  --color=query:#c0caf5:regular \
-	  --color=scrollbar:#27a1b9 \
-	  --color=separator:#ff9e64 \
-	  --color=spinner:#ff007c \
+	  --info=inline-right --ansi --layout=reverse --border=rounded \
+	  --color=border:#27a1b9 --color=fg:#c0caf5 --color=gutter:#16161e \
+	  --color=header:#ff9e64 --color=hl+:#2ac3de --color=hl:#2ac3de \
+	  --color=info:#545c7e --color=marker:#ff007c --color=pointer:#ff007c \
+	  --color=prompt:#2ac3de --color=query:#c0caf5:regular \
+	  --color=scrollbar:#27a1b9 --color=separator:#ff9e64 --color=spinner:#ff007c \
 	"
 fi
 
-
 #######################################################
-# ZSH Keybindings
+# Keybindings
 #######################################################
 bindkey -v
-# bindkey '^p' history-search-backward
-# bindkey '^n' history-search-forward
-# bindkey '^[w' kill-region
-# bindkey ' ' magic-space                           # do history expansion on space
-bindkey "^[[A" history-beginning-search-backward  # search history with up key
-bindkey "^[[B" history-beginning-search-forward   # search history with down key
-
+bindkey "^[[A" history-beginning-search-backward
+bindkey "^[[B" history-beginning-search-forward
 
 #######################################################
-# History Configuration
-#######################################################
-HISTSIZE=10000
-HISTFILE=~/.zsh/.zsh_history
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
-
-
-#######################################################
-# Completion styling
+# Completion
 #######################################################
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
@@ -171,31 +89,25 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:docker-*:*' option-stacking yes
 
-
 #######################################################
-# ZSH Syntax highlighting
+# Integrations
 #######################################################
-# source ~/.zsh/zsh-syntax-highlighting.zsh
-# source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
-
-
-#######################################################
-# eval functions
-#######################################################
-eval "$(fzf --zsh)" # fzf
-eval "$(thefuck --alias)" # thefu*k
-eval "$(thefuck --alias hell)" # thefu*k
-eval "$(thefuck --alias damn)" # thefu*k
+eval "$(fzf --zsh)"
 eval "$(zoxide init zsh)"
 
-
 #######################################################
-# source alias and functions
+# Aliases & functions
 #######################################################
 source ~/.zsh/alias.zsh
 source ~/.zsh/functions.zsh
 source ~/.zsh/functions.sh
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
 
-. "$HOME/.local/share/../bin/env"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH=/home/pn/.opencode/bin:$PATH
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+if command -v fastfetch &> /dev/null && [[ -d "$HOME/.local/share/fastfetch" ]]; then
+    alias fastfetch='clr && fastfetch --config simple'
+fi
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
