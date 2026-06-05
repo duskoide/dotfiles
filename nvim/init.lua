@@ -1,2 +1,4 @@
-require("shell-ninja.core")
-require("shell-ninja.lazy")
+-- bootstrap lazy.nvim, LazyVim and your plugins
+require("config.lazy")
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
