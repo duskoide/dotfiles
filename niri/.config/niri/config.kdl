@@ -32,7 +32,7 @@ input {
             // For more information, see xkeyboard-config(7).
 
             // For example:
-            // layout "us,ru"
+            layout "us,jp"
             // options "grp:win_space_toggle,compose:ralt,ctrl:nocaps"
 
             // If this section is empty, niri will fetch xkb settings
@@ -85,7 +85,7 @@ input {
 
     // Focus windows and outputs automatically when moving the mouse into them.
     // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
-    // focus-follows-mouse max-scroll-amount="0%"
+    focus-follows-mouse max-scroll-amount="0%"
 }
 // You can configure outputs by their name, which you can find
 // by running `niri msg outputs` while inside a niri instance.
@@ -160,7 +160,7 @@ overview {
     }
 }
 spawn-at-startup "dms" "run"
-
+spawn-at-startup "fcitx5" "-d"
 // Optional: Clipboard history
 spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
 // Add lines like this to spawn processes at startup.
@@ -248,12 +248,24 @@ window-rule {
     open-focused false
 }
 window-rule {
+    match app-id="zed"
+    match app-id="antigravity"
+    match app-id="firefox"
+    opacity 0.9
+    background-effect {
+      blur true
+    }
+}
+// Terminals
+window-rule {
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     match app-id="Alacritty"
-    match app-id="zen"
-    match app-id="com.mitchellh.ghostty"
     match app-id="kitty"
     draw-border-with-background false
+    opacity 0.85
+    background-effect {
+        blur true
+    }
 }
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"

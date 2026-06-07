@@ -111,3 +111,8 @@ if command -v fastfetch &> /dev/null && [[ -d "$HOME/.local/share/fastfetch" ]];
 fi
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+eval "$(/home/pn/.local/bin/mise activate zsh)"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/pn/.local/bin:$PATH"

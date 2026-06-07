@@ -1,0 +1,7 @@
+window-rule {
+    app-id "."
+    geometry x=0 y=0 width=0 height=0
+    blur {
+        size 10
+    }
+}
