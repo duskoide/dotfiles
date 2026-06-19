@@ -16,6 +16,7 @@ shfmt = "latest"
 node = "20"
 python = "3.11"
 rust = "latest"
+zellij = "latest"
 
 [env]
 EDITOR = "nvim"
