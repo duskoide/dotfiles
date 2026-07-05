@@ -54,6 +54,9 @@ export HISTSIZE=10000
 export HISTFILE=~/.zsh/.zsh_history
 export SAVEHIST=$HISTSIZE
 export HISTDUP=erase
+export POOLSIDE_API_KEY=sky_tV0HREhM.dtyWeCIIQ88xYSzexNqPO2LgbjTwtJVm
+export ZENMUX_API_KEY=sk-ai-v1-f935bbf9b7cd53bc664ed365dc89bbc5ebaae2cfa130dd7b25f8bb2c89491ad4
+export CONTEXT7_API_KEY=ctx7sk-75d5d7ce-de61-449a-ad24-dc50a7a92c85
 
 if [[ -x "$(command -v bat)" ]]; then
 	export MANPAGER="sh -c 'col -bx | bat -l man -p'"
@@ -113,6 +116,12 @@ fi
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
 eval "$(/home/pn/.local/bin/mise activate zsh)"
 
+# Load Nix environment variables
+if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
+  . $HOME/.nix-profile/etc/profile.d/nix.sh
+fi
 
 # Added by Antigravity CLI installer
 export PATH="/home/pn/.local/bin:$PATH"
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"

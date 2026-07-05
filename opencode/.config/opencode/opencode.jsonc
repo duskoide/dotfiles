@@ -13,6 +13,21 @@
           "name": "Kimi K2.7 Code free"              
         }
       }
+    },
+    "poolside": {
+      "api": "openai",
+      "options": {
+        "apiKey": "{env:POOLSIDE_API_KEY}",
+        "baseURL": "https://inference.poolside.ai/v1"
+      },
+      "models": {
+        "laguna-m.1": {
+          "name": "Laguna M.1"
+        },
+        "laguna-xs.2": {
+          "name": "Laguna XS.2"
+        }
+      }
     }
   },
   "mcp": {
@@ -23,11 +38,17 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       }
+    },
+    "typeui": {
+      "type": "remote",
+      "url": "https://mcp.typeui.sh",
+      "enabled": true
     }
   },
   
 
   "plugin": [
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "@dietrichgebert/ponytail"
   ]
 }

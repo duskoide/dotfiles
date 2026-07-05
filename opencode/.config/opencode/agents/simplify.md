@@ -1,13 +1,12 @@
 ---
 description: Spots overengineering and unnecessary complexity. Proposes concrete simplifications.
 mode: subagent
-model:
 temperature: 0.4
-tools:
+permission:
   # Read-only: no write/edit/shell
-  write: false
-  edit: false
-  bash: false
+  write: deny
+  edit: deny
+  bash: deny
 ---
 
 # Simplify — Overengineering & Complexity Reviewer

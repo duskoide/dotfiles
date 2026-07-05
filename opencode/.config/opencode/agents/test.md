@@ -1,12 +1,8 @@
 ---
 description: Writes meaningful failing tests from task specs using TDD, verifying RED before handing off to @make
 mode: subagent
-model: anthropic/claude-sonnet-4-6-1m
+model: moonshotai/kimi-k2.7-code-free
 temperature: 0.2
-tools:
-  write: true
-  edit: true
-  bash: true
 permission:
   bash:
     # Default deny

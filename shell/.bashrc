@@ -14,3 +14,5 @@ PS1='[\u@\h \W]\$ '
 
 # Added by Antigravity CLI installer
 export PATH="/home/pn/.local/bin:$PATH"
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"

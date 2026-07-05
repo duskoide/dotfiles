@@ -1,13 +1,12 @@
 ---
 description: Design reviewer that systematically identifies risks, gaps, and flaws in plans, architectures, and PRs
 mode: subagent
-model:
 temperature: 0.4
-tools:
+permission:
   # Read-only: no write/edit/shell
-  write: false
-  edit: false
-  bash: false
+  write: deny
+  edit: deny
+  bash: deny
 ---
 
 # Check - Systematic Design Reviewer

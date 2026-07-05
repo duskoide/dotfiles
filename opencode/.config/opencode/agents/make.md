@@ -1,12 +1,7 @@
 ---
 description: Implements discrete coding tasks from specs with acceptance criteria, verifying each implementation before completion
 mode: subagent
-model:
 temperature: 0.2
-tools:
-  write: true
-  edit: true
-  bash: true
 permission:
   bash:
     # Default deny
@@ -305,7 +300,7 @@ When the caller provides pre-written failing tests from `@test`:
 2. Confirm they fail (RED). Compare against the expected failing tests and failure codes from the handoff.
 3. If tests PASS before implementation: STOP. Report anomaly to caller — behavior already exists, task spec may be wrong.
 4. If tests fail for wrong reason (TEST_BROKEN): STOP. Report to caller for test fixes.
-5. If test quality concerns (wrong assertions, testing mocks, missing edge cases): report with details. Caller routes to `@check` for diagnosis, then to `@test` for fixes.
+5. If test quality concerns (wrong assertions, missing edge cases): report with details. Caller routes to `@check` for diagnosis, then to `@test` for fixes.
 
 **Escalation ownership:** You diagnose and report test issues. You do NOT edit test files. The caller routes to `@check` (diagnosis) → `@test` (fixes) → back to you.
 
