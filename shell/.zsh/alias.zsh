@@ -17,7 +17,7 @@ alias susegrub="sudo grub2-mkconfig -o /boot/grub2/grub.cfg"    # opensuse
 alias fedbup="sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg" # fedora
 alias ..='cd ..'    # go back
 alias ...='cd ../..'    # go back 2 steps
-alias .='cd /'  # go to root dir
+alias root='cd /'  # go to root dir
 alias cd='z'
 
 # other
