@@ -1,0 +1,4 @@
+# Private secrets — contains live API keys, must never be committed
+shell/.zsh/secrets.zsh
+# Personal shell history
+shell/.zsh/.zsh_history

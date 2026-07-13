@@ -62,6 +62,9 @@ alias pull='git pull'
 alias info='git_info'
 alias status='git status'
 
+# util
+alias lg='lazygit'
+
 # others
 alias nc='clr && neofetch'
 alias neofetch='clr && neofetch'
