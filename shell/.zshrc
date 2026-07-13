@@ -20,9 +20,12 @@ zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 
-ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
-ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
-ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
+# zsh-vi-mode cursor styles (applied during plugin load via zvm_config)
+function zvm_config() {
+  ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
+  ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
+  ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
+}
 zinit light jeffreytse/zsh-vi-mode
 
 zinit snippet OMZP::git
@@ -32,7 +35,7 @@ zinit snippet OMZP::command-not-found
 autoload -Uz compinit && compinit
 zinit cdreplay -q
 
-[[ ! -f ~/.zsh/.p10k.zsh ]] || source ~/.zsh/.p10k.zsh
+[[ -f ~/.zsh/.p10k.zsh ]] && source ~/.zsh/.p10k.zsh
 
 #######################################################
 # Options
@@ -41,22 +44,21 @@ setopt autocd correct interactivecomments magicequalsubst
 setopt nonomatch notify numericglobsort promptsubst
 
 setopt appendhistory sharehistory
-setopt hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_ignore_dups hist_find_no_dups
+setopt hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_find_no_dups
 
 #######################################################
 # Environment
 #######################################################
-export EDITOR="nvim visudo"
-export VISUAL="nvim visudo"
+export EDITOR="nvim"
+export VISUAL="nvim"
 export SUDO_EDITOR=nvim
 export FCEDIT=nvim
 export HISTSIZE=10000
 export HISTFILE=~/.zsh/.zsh_history
 export SAVEHIST=$HISTSIZE
 export HISTDUP=erase
-export POOLSIDE_API_KEY=sky_tV0HREhM.dtyWeCIIQ88xYSzexNqPO2LgbjTwtJVm
-export ZENMUX_API_KEY=sk-ai-v1-f935bbf9b7cd53bc664ed365dc89bbc5ebaae2cfa130dd7b25f8bb2c89491ad4
-export CONTEXT7_API_KEY=ctx7sk-75d5d7ce-de61-449a-ad24-dc50a7a92c85
+# API keys are loaded from a private, non-committed file (chmod 600)
+[[ -f ~/.zsh/secrets.zsh ]] && source ~/.zsh/secrets.zsh
 
 if [[ -x "$(command -v bat)" ]]; then
 	export MANPAGER="sh -c 'col -bx | bat -l man -p'"
@@ -77,7 +79,6 @@ fi
 #######################################################
 # Keybindings
 #######################################################
-bindkey -v
 bindkey "^[[A" history-beginning-search-backward
 bindkey "^[[B" history-beginning-search-forward
 
@@ -103,25 +104,24 @@ eval "$(zoxide init zsh)"
 #######################################################
 source ~/.zsh/alias.zsh
 source ~/.zsh/functions.zsh
-source ~/.zsh/functions.sh
 
-export PATH="$HOME/.local/bin:$PATH"
-export PATH=/home/pn/.opencode/bin:$PATH
-export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.npm-global/bin:$PATH"
 
-if command -v fastfetch &> /dev/null && [[ -d "$HOME/.local/share/fastfetch" ]]; then
+if command -v fastfetch >/dev/null 2>&1 && [[ -d "$HOME/.local/share/fastfetch" ]]; then
     alias fastfetch='clr && fastfetch --config simple'
 fi
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
-eval "$(/home/pn/.local/bin/mise activate zsh)"
+# Home Manager session variables (set by `home-manager switch`)
+if [ -e "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]; then
+  . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+fi
 
 # Load Nix environment variables
 if [ -e $HOME/.nix-profile/etc/profile.d/nix.sh ]; then
   . $HOME/.nix-profile/etc/profile.d/nix.sh
 fi
 
-# Added by Antigravity CLI installer
-export PATH="/home/pn/.local/bin:$PATH"
-
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
