@@ -1,0 +1,12 @@
+{
+  "lastChangelogVersion": "0.80.7",
+  "defaultProvider": "opencode",
+  "defaultModel": "hy3-free",
+  "defaultThinkingLevel": "high",
+  "theme": "dark",
+  "packages": [
+    "npm:@upstash/context7-pi",
+    "npm:pi-superpowers-plus",
+    "npm:pi-web-access"
+  ]
+}

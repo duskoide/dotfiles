@@ -1,0 +1,4 @@
+# runtime artifacts (never committed)
+**/.venv/
+.ready
+.gcc_lib_path
