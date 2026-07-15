@@ -26,6 +26,24 @@ function zvm_config() {
   ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
   ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
 }
+
+# History search that leaves the cursor at the END of the line (not the start).
+# zsh-vi-mode rebinds the arrow keys, so we apply these via its after-init hook
+# to make sure our binding wins over the plugin's default vi-style binding.
+function hist-backward-end() {
+  zle history-beginning-search-backward
+  zle end-of-line
+}
+function hist-forward-end() {
+  zle history-beginning-search-forward
+  zle end-of-line
+}
+zle -N hist-backward-end
+zle -N hist-forward-end
+zvm_after_init_commands+=(
+  "bindkey '^[[A' hist-backward-end"
+  "bindkey '^[[B' hist-forward-end"
+)
 zinit light jeffreytse/zsh-vi-mode
 
 zinit snippet OMZP::git
@@ -79,8 +97,11 @@ fi
 #######################################################
 # Keybindings
 #######################################################
-bindkey "^[[A" history-beginning-search-backward
-bindkey "^[[B" history-beginning-search-forward
+# Arrow keys: recall previous/next history entry, cursor jumps to end of line.
+# (The effective binding for zsh-vi-mode is applied via zvm_after_init_commands
+#  in the plugin-load block above; these lines mirror it for non-vi contexts.)
+bindkey "^[[A" hist-backward-end
+bindkey "^[[B" hist-forward-end
 
 #######################################################
 # Completion
@@ -105,7 +126,7 @@ eval "$(zoxide init zsh)"
 source ~/.zsh/alias.zsh
 source ~/.zsh/functions.zsh
 
-export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$HOME/.npm-global/bin:$HOME/.cargo/bin:$PATH"
 
 if command -v fastfetch >/dev/null 2>&1 && [[ -d "$HOME/.local/share/fastfetch" ]]; then
     alias fastfetch='clr && fastfetch --config simple'
