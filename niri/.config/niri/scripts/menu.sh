@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 dir="$HOME/.config/rofi/menu"
-theme='style-5'
+theme='style-6'
 
 ## Run
 rofi \

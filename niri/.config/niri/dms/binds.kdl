@@ -10,7 +10,7 @@ binds {
     //    spawn "dms" "ipc" "call" "spotlight" "toggle";
     //}
     Mod+D hotkey-overlay-title="Rofi" {
-        spawn "rofi" "-show" "drun";
+        spawn "sh" "-c" "$HOME/.config/niri/scripts/menu.sh";
     }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "dms" "ipc" "call" "clipboard" "toggle";
