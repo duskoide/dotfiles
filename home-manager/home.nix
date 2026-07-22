@@ -18,12 +18,9 @@ in {
     nodejs
     openjdk25
     python311
-    rustc
-    cargo
-    rustfmt
-    clippy
+    python311Packages.pip
+    rustup
     bun
-    python314Packages.pip
 
     # cli utilities
     ripgrep
@@ -33,10 +30,15 @@ in {
     gum
     eza
     bat
+    delta
+    glow
     stylua
     shellcheck
     shfmt
     tty-clock
+    pnpm
+    turso-cli
+    sqld
 
     # terminal apps
     btop

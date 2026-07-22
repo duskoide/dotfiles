@@ -1,12 +1,32 @@
 {
-  "lastChangelogVersion": "0.80.7",
+  "lastChangelogVersion": "0.80.10",
   "defaultProvider": "opencode",
-  "defaultModel": "hy3-free",
+  "defaultModel": "big-pickle",
   "defaultThinkingLevel": "high",
   "theme": "dark",
   "packages": [
     "npm:@upstash/context7-pi",
-    "npm:pi-superpowers-plus",
-    "npm:pi-web-access"
-  ]
+    "npm:@dietrichgebert/ponytail",
+    "npm:@ff-labs/pi-fff",
+    "npm:pi-web-access",
+    "npm:pi-alibaba-models",
+    "npm:gentle-pi",
+    "npm:pi-subagents-j0k3r",
+    "npm:pi-intercom",
+    "npm:gentle-engram",
+    "npm:pi-lens",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "npm:@pi-lab/webfetch",
+    "npm:pi-memory"
+  ],
+  "terminal": {
+    "showTerminalProgress": true,
+    "imageWidthCells": 120
+  },
+  "quietStartup": true,
+  "defaultProjectTrust": "always",
+  "doubleEscapeAction": "tree",
+  "enableSkillCommands": true,
+  "collapseChangelog": false
 }

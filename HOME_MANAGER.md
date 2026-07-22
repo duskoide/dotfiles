@@ -17,9 +17,11 @@ The flake targets `x86_64-linux` with `stateVersion = "24.11"` and enables `targ
 ## What's Managed
 
 ### Packages (global, always in PATH)
-Dev toolchains: nodejs, openjdk, python, rust, cargo, bun, zellij, herdr
-CLI tools: ripgrep, fd, fzf, jq, gum, eza, bat, stylua, shellcheck, shfmt, tty-clock
-Terminal apps: btop, fastfetch, lazygit, helix, yazi, neovim, github-cli
+Dev toolchains: nodejs, openjdk25, python311 (+pip), rustup, bun
+CLI tools: ripgrep, fd, fzf, jq, gum, eza, bat, delta, glow, stylua, shellcheck, shfmt, tty-clock, nodePackages.pnpm, turso-cli, sqld
+Terminal apps: btop, fastfetch, lazygit, helix, yazi, neovim, github-cli, zellij, rofi, herdr
+
+Rust toolchains (rustc/cargo/rustfmt/clippy) come from `rustup` rather than nixpkgs, so `~/.cargo/bin` is on PATH and toolchain switching works as usual. Run `rustup default stable` once on a fresh machine.
 
 Install/add/remove by editing `home.packages` in `home.nix` then running `home-manager switch`.
 
@@ -55,7 +57,7 @@ direnv allow
 PATH_add ./node_modules/.bin
 ```
 
-When you leave the directory, direnv unloads automatically. For version switching, combine with `mise` inside project dirs.
+When you leave the directory, direnv unloads automatically. For per-project toolchains, use a nix dev shell (`nix develop` with a `flake.nix`) or `direnv` `use flake` instead of a separate version manager.
 
 ## Git Configuration
 
@@ -87,8 +89,7 @@ Previous generations are retained automatically.
 
 ## What's Left Outside
 
-- **Desktop/GUI**: niri, hyprland, waybar, rofi, sddm, pipewire, etc. stay on Fedora (dnf/flatpak). Config files for these are still symlinked manually from dotfiles.
-- **Linuxbrew**: Still sourced for delta, glow, pnpm, turso, sqld, stellar. Can be uninstalled once those are migrated to nix.
+- **Desktop/GUI**: niri, hyprland, waybar, rofi, sddm, pipewire, etc. stay on the host distro (dnf/flatpak). Config files for these are still symlinked manually from dotfiles.
 - **`~/.pi`**: Live runtime state (not symlinked — the repo copy is only a partial backup).
 - **Bash files**: `~/.bashrc` and `~/.bash_profile` remain manual symlinks (zsh is the primary shell).
 
@@ -99,6 +100,6 @@ Previous generations are retained automatically.
 | `flake.nix` | Flake definition, inputs, module imports |
 | `home.nix` | Packages, env vars, symlinks, program modules |
 | `shell.nix` | Zsh plugins, aliases, options, init content |
-| `dotfiles/shell/.zsh/functions.zsh` | Custom shell functions (gpush, ffstyle, etc.) |
+| `dotfiles/shell/.zsh/functions.zsh` | Custom shell functions (gpush, multi-distro `ss`, etc.) |
 | `dotfiles/shell/.zsh/.p10k.zsh` | Powerlevel10k theme config |
 | `dotfiles/shell/.zsh/secrets.zsh` | API keys (gitignored) |

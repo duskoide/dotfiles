@@ -6,8 +6,11 @@ binds {
 
     // === Application Launchers ===
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
-    Mod+D hotkey-overlay-title="Application Launcher" {
-        spawn "dms" "ipc" "call" "spotlight" "toggle";
+    //Mod+D hotkey-overlay-title="Application Launcher" {
+    //    spawn "dms" "ipc" "call" "spotlight" "toggle";
+    //}
+    Mod+D hotkey-overlay-title="Rofi" {
+        spawn "rofi" "-show" "drun";
     }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "dms" "ipc" "call" "clipboard" "toggle";

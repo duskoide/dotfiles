@@ -4,3 +4,5 @@ shell/.zsh/secrets.zsh
 shell/.zsh/.zsh_history
 # Nix build artifact
 home-manager/result
+# Nix build output symlink (running nix build from repo root)
+/result

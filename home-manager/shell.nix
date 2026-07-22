@@ -180,9 +180,6 @@
         # API keys live in a private, non-committed file (never in the nix store)
         [[ -f ~/.zsh/secrets.zsh ]] && source ~/.zsh/secrets.zsh
 
-        # linuxbrew still provides: delta, glow, pnpm, turso, sqld, stellar
-        [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
-
         [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
       '')
     ];
