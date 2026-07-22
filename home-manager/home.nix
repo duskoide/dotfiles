@@ -58,6 +58,7 @@ in {
     VISUAL = "nvim";
     SUDO_EDITOR = "nvim";
     TERMINAL = "kitty";
+    BROWSER = "flatpak run app.zen_browser.zen";
     NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.npm-global";
     PAGER = "bat";
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
@@ -94,6 +95,31 @@ in {
     lazygit.source = link "${dotfiles}/lazygit/.config/lazygit";
     kitty.source = link "${dotfiles}/kitty/.config/kitty";
     opencode.source = link "${dotfiles}/opencode/.config/opencode";
+  };
+
+  # Default web browser = Zen (flatpak). Covers every scheme/MIME type apps
+  # use to launch a browser, so links stop opening in Chromium.
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "x-scheme-handler/http" = "app.zen_browser.zen.desktop";
+      "x-scheme-handler/https" = "app.zen_browser.zen.desktop";
+      "x-scheme-handler/chrome" = "app.zen_browser.zen.desktop";
+      "x-scheme-handler/about" = "app.zen_browser.zen.desktop";
+      "x-scheme-handler/unknown" = "app.zen_browser.zen.desktop";
+      "text/html" = "app.zen_browser.zen.desktop";
+      "text/xml" = "app.zen_browser.zen.desktop";
+      "application/xhtml+xml" = "app.zen_browser.zen.desktop";
+      "application/xml" = "app.zen_browser.zen.desktop";
+      "application/vnd.mozilla.xul+xml" = "app.zen_browser.zen.desktop";
+      "application/x-extension-htm" = "app.zen_browser.zen.desktop";
+      "application/x-extension-html" = "app.zen_browser.zen.desktop";
+      "application/x-extension-shtml" = "app.zen_browser.zen.desktop";
+      "application/x-extension-xht" = "app.zen_browser.zen.desktop";
+      "application/x-extension-xhtml" = "app.zen_browser.zen.desktop";
+      # preserve existing handler
+      "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+    };
   };
 
   programs.git = {
