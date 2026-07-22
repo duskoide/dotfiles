@@ -79,7 +79,7 @@ window {
     border-radius:               @radius;
     border-color:                @border-colour;
     cursor:                      "default";
-    background-color:            @background-colour;
+    background-color:            #1e1e2eE6;   /* 90% opacity — rasi can't append alpha to @var */
 }
 
 /*****----- Main Box -----*****/
