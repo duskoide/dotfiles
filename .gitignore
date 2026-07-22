@@ -2,3 +2,5 @@
 shell/.zsh/secrets.zsh
 # Personal shell history
 shell/.zsh/.zsh_history
+# Nix build artifact
+home-manager/result
