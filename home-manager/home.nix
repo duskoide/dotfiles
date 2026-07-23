@@ -14,6 +14,9 @@ in {
   targets.genericLinux.enable = true;
 
   home.packages = with pkgs; [
+    zsh
+    kitty.terminfo
+
     # dev toolchains
     nodejs
     openjdk25
@@ -66,6 +69,8 @@ in {
     VISUAL = "nvim";
     SUDO_EDITOR = "nvim";
     TERMINAL = "kitty";
+    # nix zsh needs to find xterm-kitty terminfo (kitty.terminfo pkg)
+    TERMINFO_DIRS = "${config.home.homeDirectory}/.nix-profile/share/terminfo:/usr/share/terminfo";
     BROWSER = "flatpak run app.zen_browser.zen";
     NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.npm-global";
     PAGER = "bat";
