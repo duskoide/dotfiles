@@ -51,6 +51,9 @@ in {
     zellij
     rofi
     herdr.packages.${pkgs.system}.default
+
+    # GUI apps
+    kdePackages.okular
   ];
 
   home.sessionVariables = {
@@ -117,6 +120,7 @@ in {
       "application/x-extension-shtml" = "app.zen_browser.zen.desktop";
       "application/x-extension-xht" = "app.zen_browser.zen.desktop";
       "application/x-extension-xhtml" = "app.zen_browser.zen.desktop";
+      "application/pdf" = "org.kde.okular.desktop";
       # preserve existing handler
       "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
     };
