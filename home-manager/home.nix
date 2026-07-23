@@ -122,6 +122,9 @@ in {
     lazygit.source = link "${dotfiles}/lazygit/.config/lazygit";
     kitty.source = link "${dotfiles}/kitty/.config/kitty";
     opencode.source = link "${dotfiles}/opencode/.config/opencode";
+    # herdr: link only config.toml; ~/.config/herdr stays a real dir for
+    # runtime state (plugins/, plugins.json, session.json, logs).
+    "herdr/config.toml".source = link "${dotfiles}/herdr/.config/herdr/config.toml";
   };
 
   # Default web browser = Zen (flatpak). Covers every scheme/MIME type apps

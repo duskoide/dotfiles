@@ -43,6 +43,8 @@ These point back into `~/dotfiles` via `mkOutOfStoreSymlink` — edit there, no 
 - `~/.config/nvim` → LazyVim
 - `~/.config/helix`, `yazi`, `btop`, `fastfetch`, `lazygit`, `kitty`, `opencode`
 - `~/.zsh/.p10k.zsh`, `functions.zsh`, `secrets.zsh`
+- `~/.pi/web-search.json`, `~/.pi/agent/settings.json`, `APPEND_SYSTEM.md`, `alibaba-config.json`, `agents/*.md` (pi coding agent; `~/.pi/agent` stays a real dir for runtime state, `auth.json` gitignored)
+- `~/.config/herdr/config.toml` (herdr; `~/.config/herdr` stays a real dir for plugins/session/logs, all gitignored)
 
 `~/.zsh` itself is a real directory (HM puts plugins in `~/.zsh/plugins`), so files are linked individually.
 
