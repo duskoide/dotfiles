@@ -54,6 +54,11 @@ in {
 
     # GUI apps
     kdePackages.okular
+
+    # Fonts
+    iosevka-bin
+    nerd-fonts.iosevka
+    noto-fonts-cjk-serif
   ];
 
   home.sessionVariables = {
@@ -88,6 +93,20 @@ in {
   home.file.".zsh/.p10k.zsh".source = link "${dotfiles}/shell/.zsh/.p10k.zsh";
   home.file.".zsh/functions.zsh".source = link "${dotfiles}/shell/.zsh/functions.zsh";
   home.file.".zsh/secrets.zsh".source = link "${dotfiles}/shell/.zsh/secrets.zsh";
+
+  # pi (coding agent). ~/.pi/agent stays a real dir for runtime state
+  # (sessions/, memory/, npm/, caches, auth.json); only static config is
+  # linked from the repo. auth.json is never committed — re-auth per machine.
+  home.file.".pi/web-search.json".source = link "${dotfiles}/pi/.pi/web-search.json";
+  home.file.".pi/agent/settings.json".source = link "${dotfiles}/pi/.pi/agent/settings.json";
+  home.file.".pi/agent/APPEND_SYSTEM.md".source = link "${dotfiles}/pi/.pi/agent/APPEND_SYSTEM.md";
+  home.file.".pi/agent/alibaba-config.json".source = link "${dotfiles}/pi/.pi/agent/alibaba-config.json";
+  home.file.".pi/agent/agents/check.md".source = link "${dotfiles}/pi/.pi/agent/agents/check.md";
+  home.file.".pi/agent/agents/explore.md".source = link "${dotfiles}/pi/.pi/agent/agents/explore.md";
+  home.file.".pi/agent/agents/make.md".source = link "${dotfiles}/pi/.pi/agent/agents/make.md";
+  home.file.".pi/agent/agents/orchestrator.md".source = link "${dotfiles}/pi/.pi/agent/agents/orchestrator.md";
+  home.file.".pi/agent/agents/simplify.md".source = link "${dotfiles}/pi/.pi/agent/agents/simplify.md";
+  home.file.".pi/agent/agents/test.md".source = link "${dotfiles}/pi/.pi/agent/agents/test.md";
 
   xdg.configFile = {
     nvim.source = link "${dotfiles}/nvim/.config/nvim";
