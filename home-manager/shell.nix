@@ -81,6 +81,7 @@
       vim = "nvim";
       svi = "sudo nvim";
       vis = ''nvim "+set si"'';
+      spf = "superfile";
 
       # git
       add = "git add .";

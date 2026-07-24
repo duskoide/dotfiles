@@ -1,4 +1,4 @@
-{ config, pkgs, lib, herdr, ... }:
+{ config, pkgs, lib, herdr, superfile, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/dotfiles";
@@ -24,6 +24,7 @@ in {
     python311Packages.pip
     rustup
     bun
+    uv
 
     # cli utilities
     ripgrep
@@ -48,12 +49,12 @@ in {
     fastfetch
     lazygit
     helix
-    yazi
     neovim
     github-cli
     zellij
     rofi
     herdr.packages.${pkgs.system}.default
+    superfile.packages.${pkgs.system}.default
 
     # GUI apps
     kdePackages.okular
