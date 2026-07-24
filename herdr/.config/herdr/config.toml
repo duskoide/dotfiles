@@ -1,10 +1,12 @@
 onboarding = false
 
 [ui]
-agent_panel_sort = "spaces"
+agent_panel_sort = "priority"
 
 [keys]
 prefix          = "alt+q"
+help            = "prefix+/"
+
 focus_pane_left = "prefix+left"
 focus_pane_down = "prefix+down"
 focus_pane_up = "prefix+up"
