@@ -6,11 +6,8 @@ binds {
 
     // === Application Launchers ===
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
-    //Mod+D hotkey-overlay-title="Application Launcher" {
-    //    spawn "noctalia" "msg" "panel-toggle" "launcher";
-    //}
-    Mod+D hotkey-overlay-title="Rofi" {
-        spawn "sh" "-c" "$HOME/.config/niri/scripts/menu.sh";
+    Mod+D hotkey-overlay-title="Application Launcher" {
+        spawn "vicinae" "toggle";
     }
     Mod+V hotkey-overlay-title="Clipboard Manager" {
         spawn "noctalia" "msg" "panel-toggle" "clipboard";

@@ -13,11 +13,12 @@ tool/.config/tool/<config files>
 These are the configuration directories currently present in the repository:
 
 - `fresh/` — Fresh editor configuration at `fresh/.config/fresh/config.json` and `fresh/.config/fresh/init.ts`.
-- `home-manager/` — Nix flake and modules: `flake.nix`, `home.nix`, `shell.nix`, `nixos/configuration.nix`, and `nixos/hardware-configuration.nix`; see [Flake Architecture](#flake-architecture).
+- `home-manager/` — Nix flake and modules: `flake.nix`, `home.nix`, and `shell.nix`; see [Flake Architecture](#flake-architecture).
 - `kitty/` — Kitty terminal configuration at `kitty/.config/kitty/kitty.conf`, including color and theme files.
 - `niri/` — Niri compositor configuration at `niri/.config/niri/config.kdl`, modular `dms/*.kdl` includes, scripts, icons, sounds, and wallpapers.
+- `noctalia-greeter/` — Noctalia greeter declarative config (`greeter.toml`) matching the live Noctalia theme. This is a system-level greetd config (installed to root-owned `/var/lib/noctalia-greeter/greeter.toml`), not a Home Manager-link.
 - `nvim/` — Neovim configuration at `nvim/.config/nvim/`, based on LazyVim.
-- `rofi/` — Rofi launcher configuration at `rofi/.config/rofi/`, including menus, themes, and assets.
+- `rofi/` — Rofi utility-menu configuration at `rofi/.config/rofi/`, including menus, themes, and assets still used by clipboard, emoji, wallpaper, and screenshot scripts.
 - `shell/` — Bash and Zsh files; see [Shell](#shell).
 
 Root-level files include `AGENTS.md`, `HOME_MANAGER.md`, `bootstrap.sh`, and `.gitignore`. The Neovim configuration also has its own `nvim/.gitignore`.
@@ -26,18 +27,16 @@ Pi configuration is not stored in this repository. It is managed externally (for
 
 ## Flake Architecture
 
-The flake is defined in `home-manager/flake.nix` and has three inputs:
+The flake is defined in `home-manager/flake.nix` and has four inputs:
 
 - `nixpkgs` from `nixos-unstable`.
 - `home-manager` from `nix-community/home-manager`, following the flake's `nixpkgs`.
 - `superfile` from `yorukot/superfile`, also following the flake's `nixpkgs`.
+- `vicinae` from `vicinaehq/vicinae`, providing the Home Manager module; `home.nix` uses the cached `pkgs.vicinae` package.
 
-It provides two configurations:
+It provides one configuration:
 
-- `homeConfigurations.pn` — standalone Home Manager for generic Linux systems such as Fedora. It imports `home.nix` and `shell.nix` with `targets.genericLinux.enable = true` and `isNixOS = false`.
-- `nixosConfigurations.tower` — a complete NixOS system configuration. It imports `nixos/configuration.nix`, integrates `home-manager.nixosModules.home-manager`, and reuses `home.nix` and `shell.nix` with `isNixOS = true`.
-
-The NixOS modules include the system configuration and a placeholder `nixos/hardware-configuration.nix`; replace that placeholder with machine-generated hardware configuration before deploying to real hardware.
+- `homeConfigurations.pn` — standalone Home Manager for generic Linux systems. It imports `home.nix` and `shell.nix` with `targets.genericLinux.enable = true`.
 
 ## Home Manager and Config Links
 
@@ -50,7 +49,7 @@ Home Manager currently links these existing repository paths:
 - `~/.config/kitty` → `kitty/.config/kitty`
 - `~/.config/niri` → `niri/.config/niri`
 - `~/.config/nvim` → `nvim/.config/nvim`
-- `~/.config/rofi` → `rofi/.config/rofi`
+- `~/.config/rofi` → `rofi/.config/rofi` (utility menus; the app launcher is Vicinae)
 - `~/.zsh/.p10k.zsh` → `shell/.zsh/.p10k.zsh`
 - `~/.zsh/functions.zsh` → `shell/.zsh/functions.zsh`
 - `~/.zsh/secrets.zsh` → `shell/.zsh/secrets.zsh`
@@ -59,11 +58,11 @@ The `.zsh` directory remains a real directory so Home Manager can place Zsh plug
 
 ## Package Management
 
-Add or remove packages in `home-manager/home.nix`, then run the appropriate Home Manager or NixOS switch command. The declared package groups are:
+Add or remove packages in `home-manager/home.nix`, then run `home-manager switch`. The declared package groups are:
 
 - **Development toolchains:** Node.js, OpenJDK 25, Python 3.11 with pip, Rustup, Bun, and UV.
 - **CLI utilities:** ripgrep, fd, fzf, jq, gum, eza, bat, delta, glow, stylua, shellcheck, shfmt, tty-clock, pnpm, Turso CLI, and `sqld`.
-- **Terminal applications:** btop, fastfetch, lazygit, `fresh-editor`, Neovim, GitHub CLI, Zellij, Rofi, and Superfile.
+- **Terminal applications:** btop, fastfetch, lazygit, `fresh-editor`, Neovim, GitHub CLI, Zellij, Vicinae, Rofi, and Superfile.
 - **GUI and fonts:** KDE Okular, Iosevka, Iosevka Nerd Font, and Noto CJK fonts.
 
 Rust toolchains are installed and selected through `rustup`; `~/.cargo/bin` is added to the session PATH. NPM globals use the writable `~/.npm-global` prefix, which is also added to PATH.
@@ -88,7 +87,7 @@ Zsh is configured declaratively by `programs.zsh` in `home-manager/shell.nix`. T
 - Custom functions from `shell/.zsh/functions.zsh`.
 - Optional private API keys from `shell/.zsh/secrets.zsh`.
 
-Common aliases include `cd` through zoxide, `cat` through bat, `ls` through eza, `vi`/`vim` through Neovim, and `lg` through lazygit. NixOS and generic-Linux configurations expose different system rebuild aliases through `isNixOS`.
+Common aliases include `cd` through zoxide, `cat` through bat, `ls` through eza, `vi`/`vim` through Neovim, and `lg` through lazygit. Generic Linux maintenance aliases are defined in `shell.nix`.
 
 ### Bash
 
@@ -123,12 +122,6 @@ For a standalone Home Manager update:
 
 ```bash
 home-manager switch --flake ~/.config/home-manager#pn
-```
-
-For the integrated NixOS configuration:
-
-```bash
-sudo nixos-rebuild switch --flake ~/dotfiles/home-manager#tower
 ```
 
 Previous Home Manager generations can be rolled back with:

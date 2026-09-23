@@ -1,4 +1,4 @@
-{ config, pkgs, lib, isNixOS ? false, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   programs.zsh = {
@@ -113,23 +113,14 @@
 
       homeedit = "nvim ~/dotfiles/home-manager/home.nix";
       shelledit = "nvim ~/dotfiles/home-manager/shell.nix";
-    } // lib.optionalAttrs (!isNixOS) {
-      # grub / multi-distro maintenance (Fedora laptop only)
+    } // {
+      # Generic Linux maintenance
       grubup = "sudo update-grub";
       susegrub = "sudo grub2-mkconfig -o /boot/grub2/grub.cfg";
       fedbup = "sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg";
       dup = "sudo zypper dup -y";
 
       homesw = "home-manager switch --flake /home/pn/.config/home-manager#pn";
-    } // lib.optionalAttrs isNixOS {
-      # NixOS: rebuild the whole system + home-manager in one shot.
-      # Uses the nixosConfigurations entry matching this machine's hostname.
-      homesw = "sudo nixos-rebuild switch --flake ~/dotfiles/home-manager";
-      rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles/home-manager";
-
-      # podman with dockerCompat provides a docker shim; keep muscle memory
-      # working for the compose-based aliases above.
-      docker = "podman";
     };
 
     plugins = [

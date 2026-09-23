@@ -1,24 +1,40 @@
-{ config, pkgs, lib, superfile, ... }:
+{ config, pkgs, superfile, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/dotfiles";
   # Symlink that points at the live dotfiles checkout instead of the nix
   # store, so files stay editable without a rebuild.
   link = config.lib.file.mkOutOfStoreSymlink;
+
+  # GUI OpenGL/EGL apps need Nixpkgs Mesa/EGL vendor ICD configuration.
+  kittyPkg = pkgs.symlinkJoin {
+    name = "kitty";
+    paths = [ pkgs.kitty ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/kitty \
+        --set __EGL_VENDOR_LIBRARY_FILENAMES "${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json" \
+        --set LIBGL_DRIVERS_PATH "${pkgs.mesa}/lib/dri"
+    '';
+  };
 in {
   home.username = "pn";
   home.homeDirectory = "/home/pn";
   home.stateVersion = "24.11";
 
-  # Non-NixOS (Fedora) integration: locales, etc.
+  # Allow unfree packages (e.g. Obsidian). Set a predicate instead if you'd
+  # rather whitelist specific packages: allowUnfreePredicate = pkg: ...
+  nixpkgs.config.allowUnfree = true;
+
+  # Generic Linux integration: locales, etc.
   targets.genericLinux.enable = true;
 
   home.packages = with pkgs; [
-    zsh
-    kitty.terminfo
+    kittyPkg
 
     # dev toolchains
-    nodejs
+    nodejs_24
+    go
     openjdk25
     python311
     python311Packages.pip
@@ -55,12 +71,15 @@ in {
     fresh-editor
     neovim
     github-cli
+    # Rofi remains available for clipboard, emoji, wallpaper, and screenshot menus.
     rofi
     tectonic
+    termusic
     superfile.packages.${pkgs.system}.default
 
     # GUI apps
     kdePackages.okular
+    obsidian
 
     # Fonts
     iosevka-bin
@@ -90,6 +109,7 @@ in {
       + "--color=prompt:#2ac3de --color=query:#c0caf5:regular "
       + "--color=scrollbar:#27a1b9 --color=separator:#ff9e64 --color=spinner:#ff007c";
     SEARXNG_URL = "http://100.64.0.0:8888";
+    GOPATH = "$HOME/go";
   };
 
   # nix store is immutable; give npm a writable global prefix + PATH
@@ -97,6 +117,7 @@ in {
     "${config.home.homeDirectory}/.npm-global/bin"
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.cargo/bin"
+    "${config.home.homeDirectory}/go/bin"
   ];
 
   # Dotfiles repo configs, linked into place by home-manager.
@@ -169,6 +190,54 @@ in {
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  # Vicinae provides the app launcher and runs its daemon in the user session.
+  programs.vicinae = {
+    enable = true;
+    # Use the cached nixpkgs build instead of compiling the upstream flake locally.
+    package = pkgs.vicinae;
+    # The pinned nixpkgs package predates the Numen backend.
+    enableNumen = false;
+    settings.font.normal.family = "Iosevka";
+    systemd = {
+      enable = true;
+      autoStart = true;
+      environment = {
+        USE_LAYER_SHELL = 1;
+        # Match the Mesa/EGL workaround used by the Kitty wrapper.
+        __EGL_VENDOR_LIBRARY_FILENAMES =
+          "${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json";
+        LIBGL_DRIVERS_PATH = "${pkgs.mesa}/lib/dri";
+      };
+    };
+  };
+
+  # Japanese input via Fcitx5 + mozc.
+  # niri's config (~/dotfiles/niri/.config/niri/config.kdl) already spawns fcitx5
+  # (`spawn-at-startup "fcitx5" "-d"`) and sets GTK/QT/XMODIFIERS/SDL_IM_MODULE, so
+  # fcitx5 is single-instance and any systemd service + the spawn coexist fine.
+  # Toggle between the Latin (keyboard-us) and Japanese (mozc) input methods with
+  # Ctrl+Space inside the default group.
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5 = {
+      addons = with pkgs; [
+        fcitx5-mozc
+        fcitx5-gtk
+      ];
+      settings.inputMethod = {
+        GroupOrder."0" = "Default";
+        "Groups/0" = {
+          Name = "Default";
+          "Default Layout" = "us";
+          DefaultIM = "mozc";
+        };
+        "Groups/0/Items/0".Name = "keyboard-us";
+        "Groups/0/Items/1".Name = "mozc";
+      };
+    };
   };
 
   programs.home-manager.enable = true;

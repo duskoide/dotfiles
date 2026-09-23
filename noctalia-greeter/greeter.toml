@@ -1,0 +1,60 @@
+# noctalia-greeter declarative config (admin-owned; Sync/UI never write this).
+# Matches the Noctalia theme (builtin "Noctalia", custom palette, dark mode).
+# Docs: https://docs.noctalia.dev/greeter/configuration/
+
+[session]
+# Exact Name= from the session .desktop (same as `noctalia-greeter sessions` / the picker).
+default = "Niri"
+
+[user]
+# No default user; let the greeter show the user picker.
+
+[appearance]
+# Synced look, driven by the complete palette below.
+scheme = "Synced"
+theme_mode = "dark"
+corner_radius_scale = 1.0
+password_style = "default"
+power_buttons_position = "bottom-right"
+scheme_selector_position = "top-right"
+
+# Complete declarative palette (dark) matching the active Noctalia theme.
+[appearance.palette]
+primary = "#89d6b9"
+on_primary = "#003829"
+secondary = "#b2ccc0"
+on_secondary = "#1e352c"
+tertiary = "#a7cce1"
+on_tertiary = "#0b3445"
+error = "#ffb4ab"
+on_error = "#690005"
+surface = "#0f1512"
+on_surface = "#dee4df"
+surface_variant = "#1b211e"
+on_surface_variant = "#bfc9c3"
+outline = "#404944"
+shadow = "#000000"
+hover = "#a7cce1"
+on_hover = "#0b3445"
+
+# Wallpaper: built-in default image unless you Sync one in from Noctalia
+# (Settings -> Security -> Noctalia Greeter -> Sync Now). See docs for
+# per-connector [appearance.wallpapers.<connector>] overrides. To set a solid
+# fill matching the theme instead, uncomment:
+# [appearance.wallpaper]
+# path = "color:#0f1512"
+# fill_mode = "crop"
+
+# --- Output / keyboard / idle / cursor: leave default unless you know the panel ---
+# [output]
+# name = "eDP-1"
+
+# [keyboard]
+# layout = "us"
+
+# [idle]
+# timeout = 300
+
+# [cursor]
+# theme = "Adwaita"
+# size = 24

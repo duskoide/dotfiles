@@ -163,6 +163,7 @@ spawn-at-startup "noctalia"
 spawn-at-startup "fcitx5" "-d"
 // Optional: Clipboard history
 spawn-at-startup "bash" "-c" "wl-paste --watch cliphist store &"
+spawn-at-startup "nm-applet" "--indicator"
 // Add lines like this to spawn processes at startup.
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
@@ -256,7 +257,7 @@ window-rule {
     match app-id="antigravity"
     match app-id="firefox"
     match app-id="okular"
-    opacity 0.99
+    opacity 0.9
     background-effect {
       blur true
     }
@@ -267,7 +268,7 @@ window-rule {
     match app-id="Alacritty"
     match app-id="kitty"
     draw-border-with-background false
-    opacity 0.9
+    opacity 0.8
     background-effect {
         blur true
     }
@@ -307,3 +308,5 @@ include "noctalia/binds.kdl"
 include "noctalia/outputs.kdl"
 include "noctalia/cursor.kdl"
 include "noctalia/windowrules.kdl"
+
+include "noctalia.kdl"

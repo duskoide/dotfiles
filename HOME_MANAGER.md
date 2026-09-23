@@ -8,7 +8,7 @@ Desktop/configs live in `~/dotfiles` and are symlinked into place.
 
 Three files split responsibilities:
 
-- **`flake.nix`** — inputs (nixpkgs, home-manager, superfile) and flake outputs
+- **`flake.nix`** — inputs (nixpkgs, home-manager, superfile, vicinae) and flake outputs
 - **`home.nix`** — global packages, session env/PATH, config symlinks, git/fzf/zoxide/direnv programs
 - **`shell.nix`** — zsh configuration: plugins, aliases, options, history, init hooks
 
@@ -19,11 +19,11 @@ The flake targets `x86_64-linux` with `stateVersion = "24.11"` and enables `targ
 ### Packages (global, always in PATH)
 Dev toolchains: nodejs, openjdk25, python311 (+pip), rustup, bun
 CLI tools: ripgrep, fd, fzf, jq, gum, eza, bat, delta, glow, stylua, shellcheck, shfmt, tty-clock, nodePackages.pnpm, turso-cli, sqld
-Terminal apps: btop, fastfetch, lazygit, fresh-editor, neovim, github-cli, zellij, rofi, superfile
+Terminal apps: btop, fastfetch, lazygit, fresh-editor, neovim, github-cli, zellij, Vicinae, rofi, superfile
 
 Rust toolchains (rustc/cargo/rustfmt/clippy) come from `rustup` rather than nixpkgs, so `~/.cargo/bin` is on PATH and toolchain switching works as usual. Run `rustup default stable` once on a fresh machine.
 
-Install/add/remove by editing `home.packages` in `home.nix` then running `home-manager switch`.
+Install/add/remove by editing `home.packages` in `home.nix` then running `home-manager switch`. Vicinae is installed and configured through its Home Manager module using the cached nixpkgs package (currently `0.22.3`); Numen is disabled because that package does not provide the backend. Its daemon starts in the user session and `Mod+D` opens the app launcher. The service receives the Mesa/EGL paths needed by the host’s graphics stack. Rofi remains for the clipboard, emoji, wallpaper, and screenshot utility menus.
 
 ### Zsh
 `programs.zsh` replaces zinit entirely. Plugins load in order:
@@ -41,7 +41,7 @@ Secrets (`~/.zsh/secrets.zsh`) and p10k config (`~/.zsh/.p10k.zsh`) are symlinke
 These point back into `~/dotfiles` via `mkOutOfStoreSymlink` — edit there, no rebuild needed:
 
 - `~/.config/nvim` → LazyVim
-- `~/.config/helix`, `yazi`, `fastfetch`, `lazygit`, `kitty`, `opencode`, `niri`, `rofi`
+- `~/.config/helix`, `yazi`, `fastfetch`, `lazygit`, `kitty`, `opencode`, `niri`, `rofi` (utility menus; Vicinae is configured declaratively)
 - `~/.zsh/.p10k.zsh`, `functions.zsh`, `secrets.zsh`
 - `~/.pi/web-search.json`, `~/.pi/agent/settings.json`, `APPEND_SYSTEM.md`, `alibaba-config.json`, `agents/*.md` (pi coding agent; `~/.pi/agent` stays a real dir for runtime state, `auth.json` gitignored)
 
@@ -90,7 +90,7 @@ Previous generations are retained automatically.
 
 ## What's Left Outside
 
-- **Desktop/GUI**: niri, hyprland, waybar, rofi, sddm, pipewire, etc. stay on the host distro (dnf/flatpak). Niri and Rofi configuration directories are managed by Home Manager; other desktop configs are still symlinked manually from dotfiles.
+- **Desktop/GUI**: niri, hyprland, waybar, sddm, pipewire, etc. stay on the host distro (dnf/flatpak). Niri and Rofi utility-menu configurations are managed by Home Manager; Vicinae is managed by its Home Manager module; other desktop configs are still symlinked manually from dotfiles.
 - **`~/.pi`**: Live runtime state (not symlinked — the repo copy is only a partial backup).
 - **Bash files**: `~/.bashrc` and `~/.bash_profile` remain manual symlinks (zsh is the primary shell).
 
