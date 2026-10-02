@@ -1,5 +1,14 @@
 { config, pkgs, lib, ... }:
 
+let
+  # fzf-tab drains pending terminal input before starting fzf. A 1 GiB block
+  # made this pause about 1.5 seconds on this system.
+  fzfTab = pkgs.zsh-fzf-tab.overrideAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace lib/-ftb-fzf --replace-fail 'bs=1G' 'bs=64K'
+    '';
+  });
+in
 {
   programs.zsh = {
     enable = true;
@@ -178,7 +187,7 @@
       # Runs after compinit.
       (''
         # Plugins that must load after compinit, in this order
-        source ${pkgs.zsh-fzf-tab}/share/fzf-tab/fzf-tab.plugin.zsh
+        source ${fzfTab}/share/fzf-tab/fzf-tab.plugin.zsh
         source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
         source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
@@ -197,6 +206,12 @@
         source ~/.zsh/functions.zsh
         # API keys live in a private, non-committed file (never in the nix store)
         [[ -f ~/.zsh/secrets.zsh ]] && source ~/.zsh/secrets.zsh
+
+        # Token Harbor shell env (API key + gateway base URLs). It must stay a
+        # runtime source, not sessionVariables, so the secret never lands in a
+        # world-readable /nix/store path. `tokenharbor connect` would otherwise
+        # append this block straight to ~/.zshrc, which is a read-only symlink.
+        [[ -f ~/.tokenharbor/env.sh ]] && source ~/.tokenharbor/env.sh
 
         # ssh-agent: auto-start and add key if not already loaded
         if [ -z "$SSH_AUTH_SOCK" ]; then

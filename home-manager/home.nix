@@ -115,6 +115,7 @@ in {
   # nix store is immutable; give npm a writable global prefix + PATH
   home.sessionPath = [
     "${config.home.homeDirectory}/.npm-global/bin"
+    "${config.home.homeDirectory}/.tokenharbor/bin"
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.cargo/bin"
     "${config.home.homeDirectory}/go/bin"
