@@ -203,7 +203,7 @@ in
         bindkey "^[[B" hist-forward-end
 
         [[ -f ~/.zsh/.p10k.zsh ]] && source ~/.zsh/.p10k.zsh
-        source ~/.zsh/functions.zsh
+        [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
         # API keys live in a private, non-committed file (never in the nix store)
         [[ -f ~/.zsh/secrets.zsh ]] && source ~/.zsh/secrets.zsh
 

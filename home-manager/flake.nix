@@ -19,7 +19,21 @@
     let
       system = "x86_64-linux";
       username = "pn";
+      mkHome = linkDotfiles: home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.${system};
+        extraSpecialArgs = {
+          inherit superfile linkDotfiles;
+        };
+        modules = [
+          vicinae.homeManagerModules.default
+          ./home.nix
+          ./shell.nix
+        ];
+      };
     in {
+      # Same as `pn` but without symlinking repo dotfiles into ~ (see nolinks.sh)
+      homeConfigurations."${username}-nolinks" = mkHome false;
+
       # Standalone home-manager for non-NixOS machines (Fedora laptop, etc.)
       homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};

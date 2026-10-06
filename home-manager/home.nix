@@ -1,4 +1,4 @@
-{ config, pkgs, superfile, ... }:
+{ config, lib, pkgs, superfile, linkDotfiles ? true, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/dotfiles";
@@ -80,6 +80,7 @@ in {
     # GUI apps
     kdePackages.okular
     obsidian
+    pcmanfm
 
     # Fonts
     iosevka-bin
@@ -126,13 +127,16 @@ in {
   # ~/.zsh itself stays a real directory (HM puts zsh plugins in ~/.zsh/plugins),
   # so the repo files are linked individually. secrets.zsh stays out of the
   # nix store this way, and .zsh_history lives in the real dir.
-  home.file.".zsh/.p10k.zsh".source = link "${dotfiles}/shell/.zsh/.p10k.zsh";
-  home.file.".zsh/functions.zsh".source = link "${dotfiles}/shell/.zsh/functions.zsh";
-  home.file.".zsh/secrets.zsh".source = link "${dotfiles}/shell/.zsh/secrets.zsh";
+  # Skipped for the `pn-nolinks` flake output (linkDotfiles = false).
+  home.file = lib.mkIf linkDotfiles {
+    ".zsh/.p10k.zsh".source = link "${dotfiles}/shell/.zsh/.p10k.zsh";
+    ".zsh/functions.zsh".source = link "${dotfiles}/shell/.zsh/functions.zsh";
+    ".zsh/secrets.zsh".source = link "${dotfiles}/shell/.zsh/secrets.zsh";
+  };
 
   # pi (coding agent) config is managed by ~/pi-config (install.sh links it).
 
-  xdg.configFile = {
+  xdg.configFile = lib.mkIf linkDotfiles {
     nvim.source = link "${dotfiles}/nvim/.config/nvim";
     kitty.source = link "${dotfiles}/kitty/.config/kitty";
     "fresh/config.json".source = link "${dotfiles}/fresh/.config/fresh/config.json";
@@ -213,6 +217,25 @@ in {
       };
     };
   };
+
+  # Fedora's Dolphin crashes when launched from Vicinae: it inherits the Nix
+  # Qt plugin paths and Mesa overrides from Vicinae's wrapper/service. Shadow
+  # the system entry from ~/.local/share (ahead of /usr/share in XDG lookup).
+  xdg.dataFile."applications/org.kde.dolphin.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Dolphin
+    GenericName=File Manager
+    Comment=Manage your files
+    Exec=env -u QT_PLUGIN_PATH -u NIXPKGS_QT6_QML_IMPORT_PATH -u LIBGL_DRIVERS_PATH -u __EGL_VENDOR_LIBRARY_FILENAMES dolphin %u
+    Icon=org.kde.dolphin
+    Categories=Qt;KDE;System;FileTools;FileManager;
+    MimeType=inode/directory;
+    InitialPreference=10
+    Keywords=files;file management;file browsing;samba;network shares;Explorer;Finder;
+    X-DBUS-ServiceName=org.kde.dolphin
+    StartupWMClass=dolphin
+  '';
 
   # Japanese input via Fcitx5 + mozc.
   # niri's config (~/dotfiles/niri/.config/niri/config.kdl) already spawns fcitx5

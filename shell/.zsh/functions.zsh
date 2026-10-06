@@ -1,3 +1,19 @@
+# Resolve user-profile binaries before sudo replaces PATH.
+sudonix() {
+    if (( $# == 0 )); then
+        print -u2 -- 'Usage: sudonix <command> [arguments...]'
+        return 2
+    fi
+
+    local executable
+    executable=$(whence -p -- "$1") || {
+        print -u2 -- "sudonix: command not found: $1"
+        return 127
+    }
+    shift
+    command sudo -- "$executable" "$@"
+}
+
 # fn to push git commits easily
 gpush() {
 
