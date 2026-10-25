@@ -2,7 +2,7 @@
 
 Terminal environment is managed by Nix home-manager. The flake lives in `~/dotfiles/home-manager/`
 and is symlinked to `~/.config/home-manager` so there's a single repo to clone.
-Desktop/configs live in `~/dotfiles` and are symlinked into place.
+Every app config also lives under `~/dotfiles/home-manager/config/<app>/` and is linked into place by Home Manager.
 
 ## Architecture
 
@@ -10,7 +10,8 @@ Three files split responsibilities:
 
 - **`flake.nix`** — inputs (nixpkgs, home-manager, superfile, vicinae) and flake outputs
 - **`home.nix`** — global packages, session env/PATH, config symlinks, git/fzf/zoxide/direnv programs
-- **`shell.nix`** — zsh configuration: plugins, aliases, options, history, init hooks
+- **`shell.nix`** — zsh and bash configuration: plugins, aliases, options, history, init hooks
+- **`config/`** — raw app configs (nvim, kitty, niri, rofi, fresh, zsh extras, noctalia-greeter)
 
 The flake targets `x86_64-linux` with `stateVersion = "24.11"` and enables `targets.genericLinux` for Fedora compatibility.
 
@@ -33,19 +34,27 @@ Install/add/remove by editing `home.packages` in `home.nix` then running `home-m
 4. After compinit: fzf-tab, zsh-autosuggestions, zsh-syntax-highlighting
 
 Aliases, history settings, zstyles, and keybindings are declared directly in `shell.nix`.
-Remaining custom functions live in `~/.zsh/functions.zsh` (symlinked from dotfiles).
+Remaining custom functions live in `~/.zsh/functions.zsh` (linked from `config/zsh/`).
 
-Secrets (`~/.zsh/secrets.zsh`) and p10k config (`~/.zsh/.p10k.zsh`) are symlinked from the dotfiles repo — never stored in the nix store.
+Secrets (`~/.zsh/secrets.zsh`) and p10k config (`~/.zsh/.p10k.zsh`) are linked from `config/zsh/` — never stored in the nix store.
+
+### Bash
+`programs.bash` generates `~/.bashrc`, `~/.bash_profile` and `~/.profile`. Bash is a fallback shell; environment comes from `hm-session-vars.sh` like zsh.
 
 ### Config Symlinks (editable in dotfiles)
-These point back into `~/dotfiles` via `mkOutOfStoreSymlink` — edit there, no rebuild needed:
+These point back into `~/dotfiles/home-manager/config` via `mkOutOfStoreSymlink` — edit there, no rebuild needed:
 
-- `~/.config/nvim` → LazyVim
-- `~/.config/helix`, `yazi`, `fastfetch`, `lazygit`, `kitty`, `opencode`, `niri`, `rofi` (utility menus; Vicinae is configured declaratively)
-- `~/.zsh/.p10k.zsh`, `functions.zsh`, `secrets.zsh`
-- `~/.pi/web-search.json`, `~/.pi/agent/settings.json`, `APPEND_SYSTEM.md`, `alibaba-config.json`, `agents/*.md` (pi coding agent; `~/.pi/agent` stays a real dir for runtime state, `auth.json` gitignored)
+- `~/.config/nvim` → `config/nvim` (LazyVim)
+- `~/.config/kitty`, `niri`, `rofi` → `config/kitty`, `config/niri`, `config/rofi` (utility menus; Vicinae is configured declaratively)
+- `~/.config/fresh/config.json`, `init.ts` → `config/fresh/`
+- `~/.zsh/.p10k.zsh`, `functions.zsh`, `secrets.zsh` → `config/zsh/`
+
+Pi config is managed externally by `~/pi-config`.
 
 `~/.zsh` itself is a real directory (HM puts plugins in `~/.zsh/plugins`), so files are linked individually.
+
+### File manager and theming
+Thunar (host package) is the default file manager, `org.freedesktop.FileManager1` provider, and launches kitty for "Open Terminal Here". GTK uses adw-gtk3-dark, breeze-dark icons, and Noto Sans via the `gtk` module. Qt/KDE keys are set in `kdeglobals` via `qt.kde.settings`. Noctalia owns the colors (`gtk.css`, KDE `ColorScheme`) and dark/light mode. Okular is wrapped with its own Nix KDE platform theme and Breeze plugins. See AGENTS.md for the rules.
 
 ## Direnv Integration
 
@@ -77,8 +86,7 @@ symlinks `~/.config/home-manager` → `~/dotfiles/home-manager`, and runs `home-
 
 After it finishes:
 1. Open a new shell (or `source ~/.zshrc`)
-2. Recreate secrets: `nvim ~/dotfiles/shell/.zsh/secrets.zsh`
-3. Symlink any desktop configs not covered by HM (niri, hypr, rofi, waybar) if needed
+2. Fill in secrets: `nvim ~/dotfiles/home-manager/config/zsh/secrets.zsh`
 
 ## Rollback
 
@@ -90,9 +98,9 @@ Previous generations are retained automatically.
 
 ## What's Left Outside
 
-- **Desktop/GUI**: niri, hyprland, waybar, sddm, pipewire, etc. stay on the host distro (dnf/flatpak). Niri and Rofi utility-menu configurations are managed by Home Manager; Vicinae is managed by its Home Manager module; other desktop configs are still symlinked manually from dotfiles.
-- **`~/.pi`**: Live runtime state (not symlinked — the repo copy is only a partial backup).
-- **Bash files**: `~/.bashrc` and `~/.bash_profile` remain manual symlinks (zsh is the primary shell).
+- **Desktop/GUI binaries**: niri, sddm, pipewire, etc. stay on the host distro (dnf/flatpak); their user configs are managed here.
+- **`config/noctalia-greeter/greeter.toml`**: system-level greetd config; install it to `/var/lib/noctalia-greeter/greeter.toml` as root (Home Manager cannot write there).
+- **`~/.pi`**: managed by `~/pi-config`.
 
 ## File Locations
 
@@ -100,7 +108,31 @@ Previous generations are retained automatically.
 |------|---------|
 | `flake.nix` | Flake definition, inputs, module imports |
 | `home.nix` | Packages, env vars, symlinks, program modules |
-| `shell.nix` | Zsh plugins, aliases, options, init content |
-| `dotfiles/shell/.zsh/functions.zsh` | Custom shell functions (gpush, multi-distro `ss`, etc.) |
-| `dotfiles/shell/.zsh/.p10k.zsh` | Powerlevel10k theme config |
-| `dotfiles/shell/.zsh/secrets.zsh` | API keys (gitignored) |
+| `shell.nix` | Zsh/Bash plugins, aliases, options, init content |
+| `config/zsh/functions.zsh` | Custom shell functions (gpush, multi-distro `ss`, etc.) |
+| `config/zsh/.p10k.zsh` | Powerlevel10k theme config |
+| `config/zsh/secrets.zsh` | API keys (gitignored) |
+| `config/<app>/` | Raw configs for nvim, kitty, niri, rofi, fresh, noctalia-greeter |
+
+## Local Noctalia plugins (v5)
+
+Both **Project Tasks** and **Sleep Guard** are tracked under
+`home-manager/config/noctalia-plugins/`. Home Manager links
+`~/.config/noctalia-plugins` to this live source collection. Noctalia itself and
+its live settings remain host-managed. To reproduce the setup on a new machine,
+run this once with Noctalia running (also works before a Home Manager switch):
+
+```bash
+python3 ~/dotfiles/home-manager/config/noctalia-plugins/install.py --check
+python3 ~/dotfiles/home-manager/config/noctalia-plugins/install.py
+```
+
+The installer registers the path source, enables both plugins, and adds their
+bar widgets while preserving existing settings and making a backup.
+Enabling Sleep Guard adds the button; actual sleep blocking remains OFF until
+clicked and does not persist across reboot. Display blanking is unaffected.
+
+Task data/backups remain in Noctalia’s state directory, outside Git. Sleep Guard
+uses a transient user systemd unit; it does not edit system-wide lid policy.
+See the [collection README](home-manager/config/noctalia-plugins/README.md) for
+usage, tests, safety limitations, and recovery commands.

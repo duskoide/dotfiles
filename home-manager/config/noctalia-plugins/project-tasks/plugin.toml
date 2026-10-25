@@ -1,0 +1,25 @@
+id = "pn/project-tasks"
+name = "Project Tasks"
+version = "1.1.0"
+plugin_api = 24
+author = "pn"
+icon = "list-check"
+description = "Project tasks with clear statuses and links to documents or tickets."
+tags = ["bar", "panel", "productivity"]
+dependencies = ["xdg-open"]
+
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 760
+height = 620
+placement = "attached"
+open_near_click = true
+dismiss_on_outside_click = false
+
+[[widget]]
+id = "tasks"
+entry = "widget.luau"
+
+[widget.actions]
+left = "panel-toggle pn/project-tasks:panel"

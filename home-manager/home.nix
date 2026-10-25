@@ -1,10 +1,11 @@
 { config, lib, pkgs, superfile, linkDotfiles ? true, ... }:
 
 let
-  dotfiles = "${config.home.homeDirectory}/dotfiles";
+  # All app configs live under ~/dotfiles/home-manager/config/<app>.
+  cfg = "${config.home.homeDirectory}/dotfiles/home-manager/config";
   # Symlink that points at the live dotfiles checkout instead of the nix
   # store, so files stay editable without a rebuild.
-  link = config.lib.file.mkOutOfStoreSymlink;
+  link = path: config.lib.file.mkOutOfStoreSymlink "${cfg}/${path}";
 
   # GUI OpenGL/EGL apps need Nixpkgs Mesa/EGL vendor ICD configuration.
   kittyPkg = pkgs.symlinkJoin {
@@ -15,6 +16,24 @@ let
       wrapProgram $out/bin/kitty \
         --set __EGL_VENDOR_LIBRARY_FILENAMES "${pkgs.mesa}/share/glvnd/egl_vendor.d/50_mesa.json" \
         --set LIBGL_DRIVERS_PATH "${pkgs.mesa}/lib/dri"
+    '';
+  };
+
+  # Nix Okular cannot load Fedora's Qt plugins (different Qt build), so give it
+  # its own KDE platform theme + Breeze style. It then follows ~/.config/kdeglobals
+  # (colors from Noctalia, icons/style from qt.kde.settings below). Kept out of
+  # the global QT_PLUGIN_PATH so system Qt apps never load Nix plugins.
+  okularPkg = pkgs.symlinkJoin {
+    name = "okular";
+    paths = [ pkgs.kdePackages.okular ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/okular \
+        --prefix QT_PLUGIN_PATH : "${lib.makeSearchPath pkgs.kdePackages.qtbase.qtPluginPrefix [
+          pkgs.kdePackages.plasma-integration
+          pkgs.kdePackages.breeze
+        ]}" \
+        --set QT_QPA_PLATFORMTHEME kde
     '';
   };
 in {
@@ -77,10 +96,10 @@ in {
     termusic
     superfile.packages.${pkgs.system}.default
 
-    # GUI apps
-    kdePackages.okular
+    # GUI apps (Thunar itself comes from the host distro: it needs the
+    # system gvfs/tumbler/xfconf stack for trash, mounts, and thumbnails)
+    okularPkg
     obsidian
-    pcmanfm
 
     # Fonts
     iosevka-bin
@@ -97,8 +116,8 @@ in {
     TERMINAL = "kitty";
     # nix zsh needs to find xterm-kitty terminfo (kitty.terminfo pkg)
     TERMINFO_DIRS = "${config.home.homeDirectory}/.nix-profile/share/terminfo:/usr/share/terminfo";
-    BROWSER = "flatpak run app.zen_browser.zen";
-    # plannotator pi extension: BROWSER above is multi-word (flatpak run ...) and breaks spawn()
+    # Zen is the Fedora RPM (zen-browser), not the Flatpak.
+    BROWSER = "zen-browser";
     PLANNOTATOR_BROWSER = "xdg-open";
     NPM_CONFIG_PREFIX = "${config.home.homeDirectory}/.npm-global";
     PAGER = "bat";
@@ -122,53 +141,71 @@ in {
     "${config.home.homeDirectory}/go/bin"
   ];
 
-  # Dotfiles repo configs, linked into place by home-manager.
-  # Edit in ~/dotfiles, no rebuild needed.
+  # Repo configs (home-manager/config/*), linked into place by home-manager.
+  # Edit in ~/dotfiles/home-manager/config, no rebuild needed.
   # ~/.zsh itself stays a real directory (HM puts zsh plugins in ~/.zsh/plugins),
   # so the repo files are linked individually. secrets.zsh stays out of the
   # nix store this way, and .zsh_history lives in the real dir.
   # Skipped for the `pn-nolinks` flake output (linkDotfiles = false).
   home.file = lib.mkIf linkDotfiles {
-    ".zsh/.p10k.zsh".source = link "${dotfiles}/shell/.zsh/.p10k.zsh";
-    ".zsh/functions.zsh".source = link "${dotfiles}/shell/.zsh/functions.zsh";
-    ".zsh/secrets.zsh".source = link "${dotfiles}/shell/.zsh/secrets.zsh";
+    ".zsh/.p10k.zsh".source = link "zsh/.p10k.zsh";
+    ".zsh/functions.zsh".source = link "zsh/functions.zsh";
+    ".zsh/secrets.zsh".source = link "zsh/secrets.zsh";
   };
 
   # pi (coding agent) config is managed by ~/pi-config (install.sh links it).
 
-  xdg.configFile = lib.mkIf linkDotfiles {
-    nvim.source = link "${dotfiles}/nvim/.config/nvim";
-    kitty.source = link "${dotfiles}/kitty/.config/kitty";
-    "fresh/config.json".source = link "${dotfiles}/fresh/.config/fresh/config.json";
-    "fresh/init.ts".source = link "${dotfiles}/fresh/.config/fresh/init.ts";
+  xdg.configFile = lib.mkMerge [ (lib.mkIf linkDotfiles {
+    nvim.source = link "nvim";
+    kitty.source = link "kitty";
+    "fresh/config.json".source = link "fresh/config.json";
+    "fresh/init.ts".source = link "fresh/init.ts";
     # Manage the complete Niri configuration directory from the repository.
-    niri.source = link "${dotfiles}/niri/.config/niri";
-    rofi.source = link "${dotfiles}/rofi/.config/rofi";
-  };
+    niri.source = link "niri";
+    rofi.source = link "rofi";
+    "noctalia-plugins".source = link "noctalia-plugins";
+  }) {
+    # Thunar "Open Terminal Here" (exo-open) -> kitty; helper defined below.
+    "xfce4/helpers.rc".text = ''
+      TerminalEmulator=kitty
+    '';
+    # Portal file pickers use the GTK dialog, matching Thunar.
+    "xdg-desktop-portal/portals.conf".text = ''
+      [preferred]
+      default=gnome
+      org.freedesktop.impl.portal.FileChooser=gtk
+    '';
+  } ];
 
-  # Default web browser = Zen (flatpak). Covers every scheme/MIME type apps
+  # Default web browser = Zen (Fedora RPM, zen-browser.desktop). The desktop ID
+  # must exist, or every launcher silently falls back on its own (gio -> Firefox,
+  # mimeinfo.cache users -> Chromium). Covers every scheme/MIME type apps
   # use to launch a browser, so links stop opening in Chromium.
-  xdg.mimeApps = {
+  xdg.mimeApps = let zen = "zen-browser.desktop"; in {
     enable = true;
     defaultApplications = {
-      "x-scheme-handler/http" = "app.zen_browser.zen.desktop";
-      "x-scheme-handler/https" = "app.zen_browser.zen.desktop";
-      "x-scheme-handler/chrome" = "app.zen_browser.zen.desktop";
-      "x-scheme-handler/about" = "app.zen_browser.zen.desktop";
-      "x-scheme-handler/unknown" = "app.zen_browser.zen.desktop";
-      "text/html" = "app.zen_browser.zen.desktop";
-      "text/xml" = "app.zen_browser.zen.desktop";
-      "application/xhtml+xml" = "app.zen_browser.zen.desktop";
-      "application/xml" = "app.zen_browser.zen.desktop";
-      "application/vnd.mozilla.xul+xml" = "app.zen_browser.zen.desktop";
-      "application/x-extension-htm" = "app.zen_browser.zen.desktop";
-      "application/x-extension-html" = "app.zen_browser.zen.desktop";
-      "application/x-extension-shtml" = "app.zen_browser.zen.desktop";
-      "application/x-extension-xht" = "app.zen_browser.zen.desktop";
-      "application/x-extension-xhtml" = "app.zen_browser.zen.desktop";
+      "x-scheme-handler/http" = zen;
+      "x-scheme-handler/https" = zen;
+      "x-scheme-handler/chrome" = zen;
+      "x-scheme-handler/about" = zen;
+      "x-scheme-handler/unknown" = zen;
+      "text/html" = zen;
+      "text/xml" = zen;
+      "application/xhtml+xml" = zen;
+      "application/xml" = zen;
+      "application/vnd.mozilla.xul+xml" = zen;
+      "application/x-extension-htm" = zen;
+      "application/x-extension-html" = zen;
+      "application/x-extension-shtml" = zen;
+      "application/x-extension-xht" = zen;
+      "application/x-extension-xhtml" = zen;
       "application/pdf" = "org.kde.okular.desktop";
+      "inode/directory" = "thunar.desktop";
       # preserve existing handler
       "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+      "x-scheme-handler/qoder" = "qoder.desktop";
+      "x-scheme-handler/qoder-app" = "qoder.desktop";
+      "application/x-archimate" = "archi.desktop";
     };
   };
 
@@ -218,27 +255,66 @@ in {
     };
   };
 
-  # Fedora's Dolphin crashes when launched from Vicinae: it inherits the Nix
-  # Qt plugin paths and Mesa overrides from Vicinae's wrapper/service. Shadow
-  # the system entry from ~/.local/share (ahead of /usr/share in XDG lookup).
-  xdg.dataFile."applications/org.kde.dolphin.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=Dolphin
-    GenericName=File Manager
-    Comment=Manage your files
-    Exec=env -u QT_PLUGIN_PATH -u NIXPKGS_QT6_QML_IMPORT_PATH -u LIBGL_DRIVERS_PATH -u __EGL_VENDOR_LIBRARY_FILENAMES dolphin %u
-    Icon=org.kde.dolphin
-    Categories=Qt;KDE;System;FileTools;FileManager;
-    MimeType=inode/directory;
-    InitialPreference=10
-    Keywords=files;file management;file browsing;samba;network shares;Explorer;Finder;
-    X-DBUS-ServiceName=org.kde.dolphin
-    StartupWMClass=dolphin
+  # ---- File manager: Thunar -------------------------------------------------
+  # Both Thunar and Caja claim org.freedesktop.FileManager1 ("Show in folder"
+  # from browsers etc.). A user-level service file wins over /usr/share.
+  xdg.dataFile."dbus-1/services/org.freedesktop.FileManager1.service".text = ''
+    [D-BUS Service]
+    Name=org.freedesktop.FileManager1
+    Exec=/usr/bin/Thunar --gapplication-service
+    SystemdService=thunar.service
   '';
 
+  # "Open Terminal Here" (Thunar custom action -> exo-open) launches kitty;
+  # helpers.rc is set in xdg.configFile above.
+  xdg.dataFile."xfce4/helpers/kitty.desktop".text = ''
+    [Desktop Entry]
+    NoDisplay=true
+    Version=1.0
+    Type=X-XFCE-Helper
+    X-XFCE-Category=TerminalEmulator
+    X-XFCE-Commands=kitty
+    X-XFCE-CommandsWithParameter=kitty -- "%s"
+    Icon=kitty
+    Name=kitty
+  '';
+
+  # ---- Toolkit theming ------------------------------------------------------
+  # Noctalia owns colors and light/dark mode: it writes gtk-{3,4}.0/gtk.css
+  # (imports noctalia.css), flips adw-gtk3/adw-gtk3-dark and the color-scheme
+  # key, and applies its KDE color scheme to kdeglobals. Home Manager only sets
+  # the rules underneath: theme family, icons, font, widget style.
+  gtk = {
+    enable = true;
+    theme = {
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
+    };
+    iconTheme = {
+      name = "breeze-dark";
+      package = pkgs.kdePackages.breeze-icons;
+    };
+    font = {
+      name = "Noto Sans";
+      size = 10;
+    };
+    # Leave gtk-4.0/gtk.css to Noctalia (libadwaita ignores gtk-theme-name).
+    gtk4.theme = null;
+  };
+
+  # Qt/KDE apps read these from kdeglobals. kwriteconfig6 edits keys in place,
+  # so Noctalia's ColorScheme and app-written state are left alone.
+  qt.kde.settings.kdeglobals = {
+    Icons.Theme = "breeze-dark";
+    KDE.widgetStyle = "Breeze";
+    General = {
+      font = "Noto Sans,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+      fixed = "Iosevka,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1";
+    };
+  };
+
   # Japanese input via Fcitx5 + mozc.
-  # niri's config (~/dotfiles/niri/.config/niri/config.kdl) already spawns fcitx5
+  # niri's config (home-manager/config/niri/config.kdl) already spawns fcitx5
   # (`spawn-at-startup "fcitx5" "-d"`) and sets GTK/QT/XMODIFIERS/SDL_IM_MODULE, so
   # fcitx5 is single-instance and any systemd service + the spawn coexist fine.
   # Toggle between the Latin (keyboard-us) and Japanese (mozc) input methods with

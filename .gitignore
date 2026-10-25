@@ -1,7 +1,7 @@
 # Private secrets — contains live API keys, must never be committed
-shell/.zsh/secrets.zsh
+home-manager/config/zsh/secrets.zsh
 # Personal shell history
-shell/.zsh/.zsh_history
+home-manager/config/zsh/.zsh_history
 # Nix build artifact
 home-manager/result
 # Nix build output symlink (running nix build from repo root)

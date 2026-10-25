@@ -171,6 +171,7 @@ spawn-at-startup "nm-applet" "--indicator"
 // This line starts waybar, a commonly used bar for Wayland compositors.
 environment {
   XDG_CURRENT_DESKTOP "niri"
+  QT_QPA_PLATFORMTHEME "kde"
   GTK_IM_MODULE "fcitx"
   QT_IM_MODULE "fcitx"
   XMODIFIERS "@im=fcitx"
@@ -267,6 +268,7 @@ window-rule {
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     match app-id="Alacritty"
     match app-id="kitty"
+    match app-id="thunar"
     draw-border-with-background false
     opacity 0.8
     background-effect {

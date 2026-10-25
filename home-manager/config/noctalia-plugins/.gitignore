@@ -1,0 +1,7 @@
+# Generated Python bytecode, never user task data
+__pycache__/
+*.pyc
+# Defensive: runtime task data belongs under ~/.local/state/noctalia, not here
+tasks.json
+tasks.json.bak
+tasks.json.tmp

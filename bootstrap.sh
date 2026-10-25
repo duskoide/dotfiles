@@ -93,7 +93,7 @@ echo "==> Symlinked ~/.config/home-manager -> $DOTFILES_DIR/home-manager"
 # secrets.zsh is intentionally ignored and therefore absent after a fresh
 # clone. Home Manager links it into ~/.zsh, so ensure the source exists before
 # activation without overwriting an existing private file.
-SECRETS_FILE="$DOTFILES_DIR/shell/.zsh/secrets.zsh"
+SECRETS_FILE="$DOTFILES_DIR/home-manager/config/zsh/secrets.zsh"
 if [[ ! -e "$SECRETS_FILE" && ! -L "$SECRETS_FILE" ]]; then
   cat > "$SECRETS_FILE" <<'EOF'
 # Put private tokens / API keys here.
@@ -105,41 +105,13 @@ else
   echo "==> Keeping existing secrets file at $SECRETS_FILE"
 fi
 
-# --- 8. Link Bash startup files ----------------------------------------------
-# Keep existing files by moving them aside before creating the repository link.
-link_with_backup() {
-  local source="$1"
-  local destination="$2"
-
-  if [[ -L "$destination" && "$(readlink "$destination")" == "$source" ]]; then
-    echo "==> Already linked $destination"
-    return 0
-  fi
-
-  if [[ -e "$destination" || -L "$destination" ]]; then
-    local backup
-    backup="${destination}.backup.$(date +%Y%m%d%H%M%S)"
-    local suffix=1
-    while [[ -e "$backup" || -L "$backup" ]]; do
-      backup="${destination}.backup.$(date +%Y%m%d%H%M%S).${suffix}"
-      suffix=$((suffix + 1))
-    done
-    mv "$destination" "$backup"
-    echo "==> Backed up $destination to $backup"
-  fi
-
-  ln -s "$source" "$destination"
-  echo "==> Linked $destination -> $source"
-}
-
-link_with_backup "$DOTFILES_DIR/shell/.bashrc" "$HOME/.bashrc"
-link_with_backup "$DOTFILES_DIR/shell/.bash_profile" "$HOME/.bash_profile"
-
-# --- 9. Build ----------------------------------------------------------------
+# --- 8. Build ----------------------------------------------------------------
 echo "==> Running home-manager switch..."
-home-manager switch --flake "$HOME/.config/home-manager#pn" --show-trace
+# Home Manager now owns ~/.bashrc, ~/.bash_profile and ~/.profile; -b moves any
+# pre-existing distro copies aside as *.hm-backup instead of failing.
+home-manager switch -b hm-backup --flake "$HOME/.config/home-manager#pn" --show-trace
 
-# --- 10. Set zsh as the login shell ------------------------------------------
+# --- 9. Set zsh as the login shell ------------------------------------------
 # Home Manager configures zsh (programs.zsh) but never runs chsh, so a fresh
 # machine keeps logging into bash. The system zsh reads all the HM-managed zsh
 # files (which load Nix via hm-session-vars), so making zsh the login shell is
@@ -186,9 +158,8 @@ echo "========================================="
 echo " Done! Open a new shell to get started."
 echo ""
 echo " Next steps:"
-echo "   1. Edit secrets:  nvim ~/dotfiles/shell/.zsh/secrets.zsh"
+echo "   1. Edit secrets:  nvim ~/dotfiles/home-manager/config/zsh/secrets.zsh"
 echo "   2. Set default Rust toolchain:  rustup default stable"
 echo "   3. Authenticate GitHub:  gh auth login"
-echo "   4. Set up Flatpak / Zen browser if needed:"
-echo "      flatpak install flathub app.zen_browser.zen"
+echo "   4. Install Zen browser (RPM providing zen-browser.desktop) if missing"
 echo "========================================="

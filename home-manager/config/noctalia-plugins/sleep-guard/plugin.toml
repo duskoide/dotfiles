@@ -1,0 +1,17 @@
+id = "pn/sleep-guard"
+name = "Sleep Guard"
+version = "1.0.0"
+plugin_api = 24
+author = "pn"
+icon = "shield-lock"
+description = "Block normal sleep and lid-close suspend while allowing the display to turn off."
+tags = ["bar", "utility", "power"]
+dependencies = ["python3", "systemd-inhibit", "systemd-run", "systemctl", "flock"]
+
+[[widget]]
+id = "guard"
+entry = "widget.luau"
+
+[[service]]
+id = "lifecycle"
+entry = "lifecycle.luau"

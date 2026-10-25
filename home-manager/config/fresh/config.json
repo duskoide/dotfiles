@@ -8,9 +8,6 @@
     "cursor_jump_animation": false,
     "line_numbers": true,
     "relative_line_numbers": true,
-    "highlight_current_line": true,
-    "highlight_current_column": false,
-    "highlight_occurrences": true,
     "line_wrap": true,
     "wrap_indent": true,
     "show_menu_bar": true,
@@ -18,7 +15,6 @@
     "show_status_bar": true,
     "show_vertical_scrollbar": true,
     "nerd_font_icons": true,
-    "rainbow_indentation": true,
     "rainbow_brackets": true,
     "use_tabs": false,
     "tab_size": 2,
@@ -33,7 +29,8 @@
         "{messages}",
         "{git_statusbar:branch}",
         "{filename}"
-      ]
+      ],
+      "right": ["{read_only}", "{line_ending}", "{encoding}", "{language}", "{lsp}", "{warnings}", "{update}", "{palette}"]
     }
   },
   "file_browser": {
@@ -42,8 +39,12 @@
   "keybindings": [
     {
       "keys": [
-        { "key": "Space", "modifiers": [] },
-        { "key": "e", "modifiers": [] }
+        {
+          "key": "Space"
+        },
+        {
+          "key": "e"
+        }
       ],
       "action": "toggle_file_explorer",
       "when": "mode:vi-normal"
@@ -56,6 +57,19 @@
         "autoStart": true,
         "arrowKeys": true,
         "searchWordUnderCursor": true
+      }
+    }
+  },
+  "version": 2,
+  "check_for_updates": false,
+  "lsp": {
+    "python": {
+      "enabled": true,
+      "auto_start": true,
+      "process_limits": {
+        "max_memory_percent": 50,
+        "max_cpu_percent": 90,
+        "enabled": true
       }
     }
   }

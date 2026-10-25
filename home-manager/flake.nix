@@ -31,21 +31,11 @@
         ];
       };
     in {
-      # Same as `pn` but without symlinking repo dotfiles into ~ (see nolinks.sh)
-      homeConfigurations."${username}-nolinks" = mkHome false;
-
       # Standalone home-manager for non-NixOS machines (Fedora laptop, etc.)
-      homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${system};
-        extraSpecialArgs = {
-          inherit superfile;
-        };
-        modules = [
-          vicinae.homeManagerModules.default
-          ./home.nix
-          ./shell.nix
-        ];
-      };
+      homeConfigurations.${username} = mkHome true;
+
+      # Same as `pn` but without symlinking home-manager/config/* into ~ (see nix-only.sh)
+      homeConfigurations."${username}-nolinks" = mkHome false;
 
     };
 }

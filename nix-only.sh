@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Install Nix + Home Manager and apply the packages/shell setup, WITHOUT
-# symlinking any repo dotfiles (~/.config/*, ~/.zsh/*, ~/.bashrc, ...).
+# symlinking the repo configs in home-manager/config (~/.config/*, ~/.zsh/*).
+# Generated shell files (~/.zshrc, ~/.bashrc, ...) are still managed.
 # Uses the `pn-nolinks` flake output. No clone needed:
 #   bash <(curl -sL https://raw.githubusercontent.com/duskoide/dotfiles/main/nix-only.sh)
 # (`curl ... | bash` also works.) Run from a checkout, it uses the local flake
@@ -63,7 +64,7 @@ fi
 
 # --- Switch (no dotfile links) -----------------------------------------------
 echo "==> Running home-manager switch (pn-nolinks)..."
-home-manager switch --flake "$FLAKE_REF#pn-nolinks" --show-trace
+home-manager switch -b hm-backup --flake "$FLAKE_REF#pn-nolinks" --show-trace
 
 # --- Login shell -------------------------------------------------------------
 # Must be a system zsh listed in /etc/shells (not the Nix one), or display

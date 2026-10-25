@@ -10,6 +10,20 @@ let
   });
 in
 {
+  # Bash is a fallback shell; zsh is the login shell. Session variables
+  # (PATH, IM modules, Nix profile, ...) come from hm-session-vars.sh.
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      ls = "ls --color=auto";
+      grep = "grep --color=auto";
+    };
+    initExtra = ''
+      PS1='[\u@\h \W]\$ '
+      [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
+    '';
+  };
+
   programs.zsh = {
     enable = true;
 
