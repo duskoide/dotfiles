@@ -7,6 +7,22 @@ let
   # store, so files stay editable without a rebuild.
   link = path: config.lib.file.mkOutOfStoreSymlink "${cfg}/${path}";
 
+  # markitdown -> pdfplumber -> pandas-stubs. In the pinned nixpkgs (e7a3ca8,
+  # ~Jul 2026) that stubs derivation cannot build: it runs pandas' own test
+  # suite through doInstallCheck (23 failures against numpy 2.5) and demands
+  # an `import pandas` check although pandas is not in its environment.
+  # pandas-stubs is a check-only input of pdfplumber and is absent from
+  # markitdown's runtime dependencies, so skipping those checks changes
+  # nothing at runtime. Drop this when the nixpkgs input is bumped.
+  pyPkgs = pkgs.python3Packages.overrideScope (_final: prev:
+    lib.optionalAttrs (prev ? pandas-stubs) {
+      pandas-stubs = prev.pandas-stubs.overridePythonAttrs (_: {
+        doCheck = false;
+        doInstallCheck = false;
+        pythonImportsCheck = [ ];
+      });
+    });
+
   # GUI OpenGL/EGL apps need Nixpkgs Mesa/EGL vendor ICD configuration.
   kittyPkg = pkgs.symlinkJoin {
     name = "kitty";
@@ -90,6 +106,8 @@ in {
     fresh-editor
     neovim
     github-cli
+    pyPkgs.markitdown
+
     # Rofi remains available for clipboard, emoji, wallpaper, and screenshot menus.
     rofi
     tectonic
